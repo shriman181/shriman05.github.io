@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demandr — Recovery Intelligence for Insurance Carriers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --cream: #f5f0e8;
+    --warm: #f9f6f0;
+    --accent: #c8522a;
+    --accent-light: #e8794d;
+    --muted: #6b6560;
+    --border: #e0d9ce;
+    --card: #ffffff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1.25rem 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(245,240,232,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+  }
+  nav.scrolled { border-bottom-color: var(--border); }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700; color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.85rem; font-weight: 400; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    background: var(--ink); color: var(--cream);
+    font-size: 0.8rem; font-weight: 500;
+    padding: 0.6rem 1.4rem; border-radius: 2px;
+    text-decoration: none; letter-spacing: 0.04em;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--accent); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    padding: 0 3rem;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 50%, rgba(200,82,42,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(200,82,42,0.04) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.4;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 900px; padding-top: 6rem; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
+    color: var(--accent); text-transform: uppercase;
+    border: 1px solid rgba(200,82,42,0.3);
+    padding: 0.35rem 0.85rem; border-radius: 2px;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-badge::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 700; line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    animation: fadeUp 0.8s 0.15s ease both;
+  }
+  .hero-headline em { font-style: italic; color: var(--accent); }
+  .hero-sub {
+    margin-top: 1.75rem;
+    font-size: 1.1rem; font-weight: 300; line-height: 1.7;
+    color: var(--muted); max-width: 540px;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+  .hero-actions {
+    margin-top: 2.5rem;
+    display: flex; gap: 1rem; align-items: center;
+    animation: fadeUp 0.8s 0.45s ease both;
+  }
+  .btn-primary {
+    background: var(--ink); color: var(--cream);
+    font-size: 0.85rem; font-weight: 500;
+    padding: 0.85rem 2rem; border-radius: 2px;
+    text-decoration: none; letter-spacing: 0.04em;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+  .btn-ghost {
+    font-size: 0.85rem; font-weight: 400; color: var(--muted);
+    text-decoration: none; padding: 0.85rem 0;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--ink); border-bottom-color: var(--ink); }
+  .hero-scroll {
+    position: absolute; bottom: 2.5rem; left: 3rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.08em; color: var(--muted);
+    display: flex; align-items: center; gap: 1rem;
+    animation: fadeUp 0.8s 0.6s ease both;
+  }
+  .hero-scroll::after {
+    content: ''; width: 40px; height: 1px; background: var(--muted);
+    animation: scrollLine 2s infinite;
+  }
+  @keyframes scrollLine {
+    0% { width: 40px; opacity: 1; }
+    50% { width: 60px; opacity: 0.5; }
+    100% { width: 40px; opacity: 1; }
+  }
+
+  /* PROBLEM SECTION */
+  .section { padding: 7rem 3rem; }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .eyebrow::before {
+    content: ''; width: 24px; height: 1px; background: var(--accent);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 500; line-height: 1.2;
+    letter-spacing: -0.02em; color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  .section-title em { font-style: italic; color: var(--accent); }
+
+  /* PROBLEM CARDS */
+  .problem-layout {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 2px; margin-top: 4rem;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .problem-card {
+    background: var(--warm); padding: 2.5rem;
+    transition: background 0.2s;
+  }
+  .problem-card:hover { background: var(--card); }
+  .problem-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem; font-weight: 700;
+    color: var(--border); line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .problem-card h3 {
+    font-size: 1.05rem; font-weight: 500; color: var(--ink);
+    margin-bottom: 0.65rem;
+  }
+  .problem-card p {
+    font-size: 0.88rem; line-height: 1.7; color: var(--muted);
+  }
+
+  /* STATS BAND */
+  .stats-band {
+    background: var(--ink); color: var(--cream);
+    padding: 4rem 3rem;
+  }
+  .stats-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  .stat-item { border-left: 1px solid rgba(255,255,255,0.15); padding-left: 1.5rem; }
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem; font-weight: 700;
+    color: var(--cream); line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .stat-number span { color: var(--accent-light); }
+  .stat-label {
+    font-size: 0.82rem; font-weight: 300;
+    color: rgba(245,240,232,0.6); line-height: 1.5;
+  }
+
+  /* HOW IT WORKS */
+  .how-bg { background: var(--warm); }
+  .steps {
+    margin-top: 4rem;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+  }
+  .step { position: relative; }
+  .step-connector {
+    position: absolute; top: 1rem; left: calc(100% - 1.5rem); right: -1.5rem;
+    height: 1px; background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step:last-child .step-connector { display: none; }
+  .step-num {
+    width: 2rem; height: 2rem; border-radius: 50%;
+    background: var(--ink); color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+  .step h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 500;
+    color: var(--ink); margin-bottom: 0.65rem;
+  }
+  .step p { font-size: 0.88rem; line-height: 1.75; color: var(--muted); }
+  .step-tag {
+    margin-top: 1.25rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.06em;
+    color: var(--accent); text-transform: uppercase;
+  }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid; grid-template-columns: 1.2fr 1fr;
+    gap: 5rem; align-items: center;
+    margin-top: 1rem;
+  }
+  .feature-list { margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; }
+  .feature-item {
+    padding: 1.25rem 1.5rem;
+    border-left: 2px solid var(--border);
+    transition: border-color 0.2s, background 0.2s;
+    border-radius: 0 2px 2px 0;
+    cursor: default;
+  }
+  .feature-item:hover, .feature-item.active {
+    border-left-color: var(--accent);
+    background: var(--warm);
+  }
+  .feature-item h4 { font-size: 0.95rem; font-weight: 500; color: var(--ink); margin-bottom: 0.35rem; }
+  .feature-item p { font-size: 0.83rem; color: var(--muted); line-height: 1.65; }
+  .feature-visual {
+    background: var(--ink);
+    border-radius: 4px;
+    padding: 2rem;
+    aspect-ratio: 4/3;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    position: relative;
+  }
+  .fv-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(245,240,232,0.4);
+    display: flex; justify-content: space-between;
+    align-items: center;
+  }
+  .fv-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-light); animation: pulse 1.5s infinite; }
+  .fv-file {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px; padding: 1rem;
+    margin: 0.5rem 0;
+  }
+  .fv-file-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; color: rgba(245,240,232,0.5);
+    margin-bottom: 0.75rem;
+  }
+  .fv-bar {
+    height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.08);
+    margin-bottom: 0.4rem;
+    position: relative; overflow: hidden;
+  }
+  .fv-bar-fill {
+    position: absolute; top: 0; left: 0; bottom: 0;
+    background: var(--accent-light);
+    border-radius: 2px;
+    animation: barFill 2s ease-in-out infinite alternate;
+  }
+  @keyframes barFill {
+    from { width: 40%; }
+    to { width: 85%; }
+  }
+  .fv-verdict {
+    background: rgba(200,82,42,0.15); border: 1px solid rgba(200,82,42,0.3);
+    border-radius: 2px; padding: 0.5rem 0.75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; color: var(--accent-light);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .fv-verdict::before { content: '✓'; font-size: 0.7rem; }
+  .fv-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem; color: rgba(245,240,232,0.3);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-top: 1rem;
+  }
+  .fv-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; font-weight: 700;
+    color: var(--cream);
+  }
+  .fv-amount span { color: var(--accent-light); }
+
+  /* MARKET */
+  .market-bg { background: var(--cream); }
+  .market-cards {
+    margin-top: 3.5rem;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .market-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .market-card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
+  .market-icon {
+    width: 2.5rem; height: 2.5rem;
+    background: rgba(200,82,42,0.08);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+  }
+  .market-card h3 { font-size: 1rem; font-weight: 500; margin-bottom: 0.6rem; }
+  .market-card p { font-size: 0.85rem; line-height: 1.7; color: var(--muted); }
+  .market-stat {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem; color: var(--accent);
+  }
+
+  /* TESTIMONIALS */
+  .testimonials-bg { background: var(--ink); color: var(--cream); }
+  .testimonials-bg .eyebrow { color: var(--accent-light); }
+  .testimonials-bg .eyebrow::before { background: var(--accent-light); }
+  .testimonials-bg .section-title { color: var(--cream); }
+  .testi-grid {
+    margin-top: 3.5rem;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .testi-card {
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 3px; padding: 2rem;
+    background: rgba(255,255,255,0.03);
+    transition: background 0.2s;
+  }
+  .testi-card:hover { background: rgba(255,255,255,0.06); }
+  .testi-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1rem; line-height: 1.7;
+    color: rgba(245,240,232,0.85);
+    margin-bottom: 1.5rem;
+  }
+  .testi-author { display: flex; align-items: center; gap: 0.75rem; }
+  .testi-avatar {
+    width: 2.25rem; height: 2.25rem; border-radius: 50%;
+    background: rgba(200,82,42,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 500; color: var(--accent-light);
+  }
+  .testi-name { font-size: 0.85rem; font-weight: 500; color: var(--cream); }
+  .testi-role { font-size: 0.78rem; color: rgba(245,240,232,0.45); }
+
+  /* TICKER */
+  .ticker {
+    background: var(--accent); color: var(--cream);
+    padding: 0.85rem 0; overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker-inner {
+    display: inline-flex; gap: 0;
+    animation: ticker 30s linear infinite;
+  }
+  .ticker-item {
+    display: inline-flex; align-items: center; gap: 1.5rem;
+    padding: 0 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .ticker-sep { opacity: 0.4; }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* FOUNDER */
+  .founder-bg { background: var(--warm); }
+  .founder-layout {
+    display: grid; grid-template-columns: 1fr 1.6fr;
+    gap: 5rem; align-items: start;
+    margin-top: 3rem;
+  }
+  .founder-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2.5rem;
+  }
+  .founder-avatar {
+    width: 5rem; height: 5rem; border-radius: 50%;
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 700; color: var(--cream);
+    margin-bottom: 1.5rem;
+  }
+  .founder-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700; color: var(--ink);
+    margin-bottom: 0.25rem;
+  }
+  .founder-title { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+  .founder-links { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .founder-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.05em;
+    color: var(--muted); text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.75rem; border-radius: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .founder-link:hover { color: var(--ink); border-color: var(--ink); }
+  .founder-bio {
+    font-size: 1.05rem; line-height: 1.85; color: var(--muted);
+  }
+  .founder-bio strong { color: var(--ink); font-weight: 500; }
+  .founder-pull {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-style: italic;
+    color: var(--ink); line-height: 1.4;
+    border-left: 3px solid var(--accent);
+    padding-left: 1.5rem; margin: 2rem 0;
+  }
+
+  /* CTA SECTION */
+  .cta-section {
+    background: var(--ink); color: var(--cream);
+    padding: 7rem 3rem;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .cta-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(200,82,42,0.12) 0%, transparent 70%);
+  }
+  .cta-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+  .cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700; line-height: 1.1;
+    color: var(--cream); margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+  .cta-title em { color: var(--accent-light); font-style: italic; }
+  .cta-sub { font-size: 1rem; color: rgba(245,240,232,0.6); margin-bottom: 2.5rem; line-height: 1.7; }
+  .cta-form { display: flex; gap: 0.75rem; max-width: 420px; margin: 0 auto; }
+  .cta-input {
+    flex: 1;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    color: var(--cream); font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; padding: 0.85rem 1rem; border-radius: 2px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .cta-input::placeholder { color: rgba(245,240,232,0.3); }
+  .cta-input:focus { border-color: var(--accent); }
+  .cta-btn {
+    background: var(--accent); color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 500;
+    padding: 0.85rem 1.5rem; border: none; border-radius: 2px;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .cta-btn:hover { background: var(--accent-light); }
+  .cta-note {
+    margin-top: 1rem;
+    font-size: 0.75rem; color: rgba(245,240,232,0.3);
+  }
+
+  /* FOOTER */
+  footer {
+    background: #080808; color: rgba(245,240,232,0.4);
+    padding: 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--cream);
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-links { display: flex; gap: 2rem; list-style: none; }
+  .footer-links a {
+    font-size: 0.78rem; color: rgba(245,240,232,0.35);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--cream); }
+  .footer-copy { font-size: 0.75rem; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">demand<span>r</span></div>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#market">Market</a></li>
+    <li><a href="#founder">About</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Request access</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Recovery Intelligence · Built for P&amp;C carriers</div>
+    <h1 class="hero-headline">
+      The demand letter<br>
+      that <em>writes itself.</em><br>
+      The recovery that<br>doesn't escape.
+    </h1>
+    <p class="hero-sub">
+      Demandr is an AI-native subrogation recovery platform that reads every claim file, identifies what's recoverable, and generates legally defensible demand letters — in minutes, not months.
+    </p>
+    <div class="hero-actions">
+      <a href="#cta" class="btn-primary">Request early access</a>
+      <a href="#how" class="btn-ghost">See how it works →</a>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll to explore</div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <span class="ticker-item">$9B+ in subrogation leakage annually <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Average recovery cycle: 9–18 months <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Commercial auto · Workers' comp · General liability <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">AI-native. Built for examiners. <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">From first notice of loss to demand letter in minutes <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">$9B+ in subrogation leakage annually <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Average recovery cycle: 9–18 months <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">Commercial auto · Workers' comp · General liability <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">AI-native. Built for examiners. <span class="ticker-sep">—</span></span>
+    <span class="ticker-item">From first notice of loss to demand letter in minutes <span class="ticker-sep">—</span></span>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="section" id="problem">
+  <div class="section-inner">
+    <div class="eyebrow reveal">The problem</div>
+    <h2 class="section-title reveal">Carriers are leaving<br><em>billions on the table.</em></h2>
+    <p style="font-size:1rem;line-height:1.75;color:var(--muted);max-width:580px;" class="reveal">Subrogation is the legal right of an insurer to recover claim costs from the at-fault party. In practice, the process is manual, slow, and riddled with files that never get touched.</p>
+
+    <div class="problem-layout reveal">
+      <div class="problem-card">
+        <div class="problem-num">01</div>
+        <h3>Buried under documents</h3>
+        <p>A senior examiner manages 60–80 open files simultaneously — each containing scanned police reports, repair invoices, adjuster notes, and photos with no structure. Reading is the job.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">02</div>
+        <h3>The $5K abandonment rule</h3>
+        <p>Carriers routinely walk away from recoveries under $5,000 because the human cost of pursuing them exceeds the expected yield. This abandoned tail represents enormous aggregate loss.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">03</div>
+        <h3>Institutional knowledge retires</h3>
+        <p>Experienced examiners carry jurisdiction-specific liability knowledge in their heads. When they leave, so does the playbook. There's no system of record for what works.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">04</div>
+        <h3>Statute-of-limitations risk</h3>
+        <p>Recovery rights expire. In the fog of a 70-file backlog, deadlines get missed — and with them, the legal right to recover at all. This is the silent killer of subrogation programs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-band">
+  <div class="stats-inner">
+    <div class="stat-item reveal">
+      <div class="stat-number">$9<span>B+</span></div>
+      <div class="stat-label">Annual subrogation leakage across US P&amp;C carriers</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-1">
+      <div class="stat-number">63<span>M</span></div>
+      <div class="stat-label">Claims processed annually in commercial auto alone</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-2">
+      <div class="stat-number">9<span>–18</span></div>
+      <div class="stat-label">Months average recovery cycle without automation</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-3">
+      <div class="stat-number">40<span>%</span></div>
+      <div class="stat-label">Of recoverable files never actioned due to capacity constraints</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section how-bg" id="how">
+  <div class="section-inner">
+    <div class="eyebrow reveal">How it works</div>
+    <h2 class="section-title reveal">From claim file to<br><em>demand letter.</em> Automatically.</h2>
+
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-connector"></div>
+        <div class="step-num">01</div>
+        <h3>Ingest &amp; parse</h3>
+        <p>Demandr ingests every document in the claim file — scanned PDFs, photos, adjuster notes, police reports — and extracts structured data using multimodal document AI.</p>
+        <div class="step-tag">Multimodal OCR · Document AI</div>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-connector"></div>
+        <div class="step-num">02</div>
+        <h3>Liability reasoning</h3>
+        <p>The system applies jurisdiction-specific liability rules and comparative negligence standards to determine fault assignment and calculate the recoverable amount with confidence scoring.</p>
+        <div class="step-tag">Legal reasoning engine · Jurisdiction logic</div>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">03</div>
+        <h3>Demand generation</h3>
+        <p>A legally defensible, jurisdiction-appropriate demand letter is generated, reviewed by the examiner, and dispatched — with follow-up cadence automated from day one.</p>
+        <div class="step-tag">Template engine · Compliance layer</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="eyebrow reveal">Platform</div>
+    <h2 class="section-title reveal">Built for the examiner.<br><em>Designed for the CFO.</em></h2>
+
+    <div class="features-grid">
+      <div>
+        <div class="feature-list reveal">
+          <div class="feature-item active">
+            <h4>File triage &amp; prioritisation</h4>
+            <p>Every incoming file is scored for recovery probability, urgency, and expected yield. Examiners work the right files first — every time.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Statute-of-limitations tracking</h4>
+            <p>Jurisdiction-specific expiry dates are auto-calculated per file. Deadlines surface automatically. No recovery right expires unnoticed.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Adverse carrier intelligence</h4>
+            <p>Demandr learns how each adverse carrier responds — which demand amounts get accepted, which framing works, when to escalate.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Low-dollar tail automation</h4>
+            <p>Files under $5K that would never be actioned by a human are handled automatically — turning abandoned volume into recovered revenue.</p>
+          </div>
+        </div>
+      </div>
+      <div class="feature-visual reveal reveal-delay-1">
+        <div class="fv-header">
+          <span>Claim file · CL-2024-08821</span>
+          <div class="fv-dot"></div>
+        </div>
+        <div>
+          <div class="fv-file">
+            <div class="fv-file-name">police_report_082024.pdf · adjuster_notes.txt · repair_invoice.pdf</div>
+            <div class="fv-bar"><div class="fv-bar-fill" style="width:92%"></div></div>
+            <div class="fv-bar"><div class="fv-bar-fill" style="width:78%; animation-delay:0.3s"></div></div>
+            <div class="fv-bar"><div class="fv-bar-fill" style="width:65%; animation-delay:0.6s"></div></div>
+          </div>
+          <div class="fv-verdict">Liability determined · At-fault party identified · 87% confidence</div>
+        </div>
+        <div>
+          <div class="fv-label">Recovery demand generated</div>
+          <div class="fv-amount">$<span>14,820</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARKET -->
+<section class="section market-bg" id="market">
+  <div class="section-inner">
+    <div class="eyebrow reveal">The market</div>
+    <h2 class="section-title reveal">A massive, unglamorous<br><em>problem. Perfectly ripe.</em></h2>
+    <p style="font-size:1rem;line-height:1.75;color:var(--muted);max-width:580px;" class="reveal">Subrogation exists across every P&C line of business. We start with commercial auto — where documents are most structured and liability is most legible — and expand from there.</p>
+
+    <div class="market-cards">
+      <div class="market-card reveal">
+        <div class="market-icon">🚗</div>
+        <h3>Commercial auto</h3>
+        <p>The beachhead. Clear fault assignment, high file volume, and structured document types make AI reasoning most reliable. Mid-size carriers ($200M–$1B written premium) are the ICP.</p>
+        <div class="market-stat">~63M claims/yr in the US alone</div>
+      </div>
+      <div class="market-card reveal reveal-delay-1">
+        <div class="market-icon">🏗️</div>
+        <h3>Workers' compensation</h3>
+        <p>Adjacent line, same buyer, 3–5x higher average recovery amounts. Third-party liability cases in workers' comp are chronically underworked and high-value.</p>
+        <div class="market-stat">$30B+ in annual WC claims with subrogation potential</div>
+      </div>
+      <div class="market-card reveal reveal-delay-2">
+        <div class="market-icon">🏢</div>
+        <h3>Third-party administrators</h3>
+        <p>TPAs administer subrogation programs for hundreds of carriers simultaneously. A single TPA contract is effectively a distribution deal — one integration, massive volume scale.</p>
+        <div class="market-stat">Top 10 US TPAs manage 40%+ of commercial claims</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section testimonials-bg">
+  <div class="section-inner">
+    <div class="eyebrow reveal">What practitioners say</div>
+    <h2 class="section-title reveal">From the people who<br><em>live inside this problem.</em></h2>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <p class="testi-quote">"I manage 75 files right now. I know there are recoveries in there I'll never get to. That's just the reality of this job. If something could tell me exactly which ones to prioritise, I'd use it immediately."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">SR</div>
+          <div>
+            <div class="testi-name">Senior Subrogation Examiner</div>
+            <div class="testi-role">Mid-size regional carrier · 14 years experience</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-delay-1">
+        <p class="testi-quote">"We abandon anything under $4K. Not because we want to — because the math doesn't work with humans. If the economics changed, we'd be recovering a completely different amount every year."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">MK</div>
+          <div>
+            <div class="testi-name">VP, Claims Operations</div>
+            <div class="testi-role">Commercial auto carrier · $400M written premium</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-delay-2">
+        <p class="testi-quote">"The statute clock is the thing that keeps me up at night. One missed deadline and we've lost the right forever. There's no system that tracks that across all my files right now."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">AT</div>
+          <div>
+            <div class="testi-name">Subrogation Team Lead</div>
+            <div class="testi-role">National insurer · 22-person subrogation unit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDER -->
+<section class="section founder-bg" id="founder">
+  <div class="section-inner">
+    <div class="eyebrow reveal">The founder</div>
+    <h2 class="section-title reveal">Built by someone who<br><em>knows the unglamorous.</em></h2>
+    <div class="founder-layout">
+      <div class="founder-card reveal">
+        <div class="founder-avatar">P</div>
+        <div class="founder-name">Priyanshu</div>
+        <div class="founder-title">Founder &amp; CEO, Demandr</div>
+        <div class="founder-links">
+          <a href="#" class="founder-link">LinkedIn</a>
+          <a href="#" class="founder-link">Twitter / X</a>
+          <a href="mailto:founder@demandr.ai" class="founder-link">Email</a>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <div class="founder-pull">"The $9B leakage number isn't abstract to me. I've watched it happen — file by file, examiner by examiner, abandoned recovery by abandoned recovery."</div>
+        <p class="founder-bio">
+          Priyanshu built Demandr after spending years inside the operational reality of B2B financial workflows — where the gap between what software promises and what people actually do with documents, spreadsheets, and manual processes is enormous.
+          <br><br>
+          He saw the same pattern repeat: <strong>high-stakes decisions being made from unstructured data by overstretched humans</strong>, with no system smart enough to help. Insurance subrogation is one of the starkest examples of that pattern — a $9B problem hiding in plain sight, dismissed as too unglamorous for anyone to build for seriously.
+          <br><br>
+          Demandr is the product Priyanshu wished existed. Not a dashboard layered on top of broken processes, but a <strong>reasoning layer that actually reads the documents</strong>, understands the law, and generates the output — so examiners can focus on judgment, not paperwork.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-bg"></div>
+  <div class="cta-inner">
+    <h2 class="cta-title">Stop leaving recovery<br>on the <em>table.</em></h2>
+    <p class="cta-sub">Demandr is in private beta with a select group of commercial carriers. Join the waitlist to be first in line.</p>
+    <div class="cta-form">
+      <input type="email" class="cta-input" placeholder="your@carrier.com">
+      <button class="cta-btn">Join waitlist</button>
+    </div>
+    <p class="cta-note">No sales calls. No commitments. We'll reach out when your spot opens.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">demand<span>r</span></div>
+  <ul class="footer-links">
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Terms</a></li>
+    <li><a href="mailto:hello@demandr.ai">hello@demandr.ai</a></li>
+  </ul>
+  <div class="footer-copy">© 2024 Demandr. All rights reserved.</div>
+</footer>
+
+<script>
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Feature items interactive
+  const featureItems = document.querySelectorAll('.feature-item');
+  featureItems.forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      featureItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // CTA form
+  document.querySelector('.cta-btn').addEventListener('click', () => {
+    const input = document.querySelector('.cta-input');
+    if (input.value && input.value.includes('@')) {
+      input.value = '';
+      input.placeholder = 'You\'re on the list. We\'ll be in touch.';
+      document.querySelector('.cta-btn').textContent = 'Done ✓';
+      document.querySelector('.cta-btn').style.background = '#1D9E75';
+    }
+  });
+</script>
+</body>
+</html>
